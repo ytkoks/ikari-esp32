@@ -124,11 +124,7 @@ void led_init(void)
     ledc_fade_func_install(0);
 
     // init led
-    led_set_(0xFF);
-    // ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, 8191);
-    // ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, 4000);
-    /* ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, 1023); */
-    /* ledc_update_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel); */
+    led_set_(0x00);
 }
 
 void led_request_value(uint8_t value)
