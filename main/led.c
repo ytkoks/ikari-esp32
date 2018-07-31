@@ -41,6 +41,8 @@
 #define LEDC_TEST_DUTY         (4000)
 #define LEDC_TEST_FADE_TIME    (3000)
 
+#define WITH_FADE              (1)
+
 /*
  * Prepare individual configuration
  * for each channel of LED Controller
@@ -145,6 +147,13 @@ void led_task(void)
 void led_set_(uint8_t value)
 {
     uint32_t duty = (value << 2) | 0x03;
+#if (WITH_FADE == 1)
+    ledc_set_fade_with_time(s_ledc_channel[0].speed_mode,
+                            s_ledc_channel[0].channel, duty, LEDC_TEST_FADE_TIME);
+    ledc_fade_start(s_ledc_channel[0].speed_mode,
+                    s_ledc_channel[0].channel, LEDC_FADE_NO_WAIT);
+#else
     ledc_set_duty(s_ledc_channel[0].speed_mode, s_ledc_channel[0].channel, duty);
     ledc_update_duty(s_ledc_channel[0].speed_mode, s_ledc_channel[0].channel);
+#endif
 }
