@@ -36,6 +36,8 @@
 
 #include "sdkconfig.h"
 
+#include "led.h"
+
 #define GATTS_TAG "GATTS_DEMO"
 
 ///Declare the static function
@@ -357,9 +359,10 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         ESP_LOGI(GATTS_TAG, "GATT_WRITE_EVT, conn_id %d, trans_id %d, handle %d", param->write.conn_id, param->write.trans_id, param->write.handle);
         if (!param->write.is_prep){
             ESP_LOGI(GATTS_TAG, "GATT_WRITE_EVT, value len %d, value :", param->write.len);
-            ESP_LOGI(GATTS_TAG, "KOKOKARA");
             esp_log_buffer_hex(GATTS_TAG, param->write.value, param->write.len);
-            ESP_LOGI(GATTS_TAG, "KOKOMADE");
+            if (param->write.len == 1) {
+                led_request_value(*(param->write.value));
+            }
             if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
                 if (descr_value == 0x0001){
@@ -679,6 +682,9 @@ void app_main()
 {
     esp_err_t ret;
 
+    // initialize led
+    led_init();
+    
     // Initialize NVS.
     ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES) {
@@ -735,6 +741,11 @@ void app_main()
     esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
     if (local_mtu_ret){
         ESP_LOGE(GATTS_TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
+    }
+
+    while (1) {
+        led_task();
+        vTaskDelay(10 / portTICK_PERIOD_MS); // delay 10ms
     }
 
     return;
