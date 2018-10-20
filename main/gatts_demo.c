@@ -37,6 +37,7 @@
 #include "sdkconfig.h"
 
 #include "led.h"
+#include "ost.h"
 
 #define GATTS_TAG "IKARI-ESP32"
 
@@ -348,7 +349,8 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
             ESP_LOGI(GATTS_TAG, "GATT_WRITE_EVT, value len %d, value :", param->write.len);
             esp_log_buffer_hex(GATTS_TAG, param->write.value, param->write.len);
             if (param->write.len == 1) {
-                led_request_value(*(param->write.value));
+                //led_request_value(*(param->write.value));
+                ost_request_value(*(param->write.value));
             }
             if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
@@ -526,7 +528,8 @@ void app_main()
     esp_err_t ret;
 
     // initialize led
-    led_init();
+    // led_init();
+    ost_init();
     
     // Initialize NVS.
     ret = nvs_flash_init();
@@ -582,7 +585,8 @@ void app_main()
     }
 
     while (1) {
-        led_task();
+        // led_task();
+        ost_task();
         vTaskDelay(10 / portTICK_PERIOD_MS); // delay 10ms
     }
 
